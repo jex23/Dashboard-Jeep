@@ -1,4 +1,3 @@
-// pages/Conductor.tsx
 import React, { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import { auth, db } from "../firebaseConfig";
@@ -83,31 +82,63 @@ const ConductorPage: React.FC = () => {
         </button>
 
         {showForm && (
-          <div style={styles.formContainer}>
-            <h3 style={styles.formHeading}>Add New Conductor</h3>
-            <form onSubmit={addConductor} style={styles.form}>
-              <div style={styles.formGroup}>
-                <label>Name</label>
-                <input type="text" name="name" value={formData.name} onChange={handleInputChange} required style={styles.input} />
+          <>
+            <div style={styles.backdrop} onClick={() => setShowForm(false)}></div>
+            <div style={styles.modalContainer}>
+              <div style={styles.formContainer}>
+                <h3 style={styles.formHeading}>Add New Conductor</h3>
+                <form onSubmit={addConductor} style={styles.form}>
+                  <div style={styles.formGroup}>
+                    <label>Name</label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                      style={styles.input}
+                    />
+                  </div>
+                  <div style={styles.formGroup}>
+                    <label>Email</label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      required
+                      style={styles.input}
+                    />
+                  </div>
+                  <div style={styles.formGroup}>
+                    <label>Password</label>
+                    <input
+                      type="password"
+                      name="password"
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      required
+                      style={styles.input}
+                    />
+                  </div>
+                  <div style={styles.formGroup}>
+                    <label>Bus Type</label>
+                    <select
+                      name="busType"
+                      value={formData.busType}
+                      onChange={handleInputChange}
+                      required
+                      style={styles.input}
+                    >
+                      <option value="Bulan">Bulan</option>
+                      <option value="Matnog">Matnog</option>
+                    </select>
+                  </div>
+                  <button type="submit" style={styles.submitButton}>Add Conductor</button>
+                </form>
               </div>
-              <div style={styles.formGroup}>
-                <label>Email</label>
-                <input type="email" name="email" value={formData.email} onChange={handleInputChange} required style={styles.input} />
-              </div>
-              <div style={styles.formGroup}>
-                <label>Password</label>
-                <input type="password" name="password" value={formData.password} onChange={handleInputChange} required style={styles.input} />
-              </div>
-              <div style={styles.formGroup}>
-                <label>Bus Type</label>
-                <select name="busType" value={formData.busType} onChange={handleInputChange} required style={styles.input}>
-                  <option value="Bulan">Bulan</option>
-                  <option value="Matnog">Matnog</option>
-                </select>
-              </div>
-              <button type="submit" style={styles.submitButton}>Add Conductor</button>
-            </form>
-          </div>
+            </div>
+          </>
         )}
 
         <h3 style={styles.listHeading}>Conductor List</h3>
@@ -255,6 +286,22 @@ const styles: { [key: string]: React.CSSProperties } = {
     cursor: "pointer",
     fontSize: "0.9rem",
     boxShadow: "0px 2px 5px rgba(255, 77, 79, 0.3)",
+  },
+  backdrop: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    zIndex: 999,
+  },
+  modalContainer: {
+    position: "fixed",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    zIndex: 1000,
   },
 };
 
