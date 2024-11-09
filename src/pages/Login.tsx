@@ -64,62 +64,84 @@ const Login: React.FC = () => {
   );
 };
 
+// Updated styles
 const styles: { [key: string]: React.CSSProperties } = {
   container: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    width: "100vw",           // Full viewport width
-    height: "100vh",          // Full viewport height
-    background: "linear-gradient(135deg, #4c6ef5, #b23fef)", // Gradient background
+    width: "100vw",
+    height: "100vh",
+    background: "linear-gradient(135deg, rgba(76, 110, 245, 0.5), rgba(178, 63, 239, 0.5))",
     padding: "1rem",
-    boxSizing: "border-box",   // Ensure padding doesn’t push content beyond viewport
+    boxSizing: "border-box",
+    backdropFilter: "blur(10px)", // Blurs everything behind the container
   },
   formContainer: {
     width: "100%",
     maxWidth: "400px",
     padding: "2rem",
-    borderRadius: "8px",
-    boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
-    backgroundColor: "#fff",
+    borderRadius: "12px",
+    background: "rgba(255, 255, 255, 0.15)", // Semi-transparent white
+    boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
+    backdropFilter: "blur(20px)", // Blurs the background behind the form
+    border: "1px solid rgba(255, 255, 255, 0.3)", // Subtle border for glass effect
+    color: "#fff", // White text for contrast
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
   },
   heading: {
     textAlign: "center",
     marginBottom: "1.5rem",
-    color: "#333",
+    fontSize: "1.75rem",
+    color: "#ffffff",
   },
   form: {
     display: "flex",
     flexDirection: "column",
+    width: "100%",
   },
   inputGroup: {
-    marginBottom: "1rem",
+    marginBottom: "1.5rem",
+    display: "flex",
+    flexDirection: "column",
   },
   label: {
     marginBottom: "0.5rem",
-    color: "#555",
+    color: "#ddd",
+    fontWeight: "500",
   },
   input: {
     width: "100%",
-    padding: "0.8rem",
-    borderRadius: "4px",
-    border: "1px solid #ddd",
+    padding: "0.75rem",
+    borderRadius: "8px",
+    border: "1px solid rgba(255, 255, 255, 0.3)", // Transparent border
+    backgroundColor: "rgba(255, 255, 255, 0.2)", // Light background with transparency
     fontSize: "1rem",
+    color: "#fff", // White text color
+    outline: "none",
+    boxSizing: "border-box",
+    transition: "border-color 0.2s",
   },
   button: {
     padding: "0.8rem",
-    backgroundColor: "#007BFF",
+    backgroundColor: "#4c6ef5",
     color: "#fff",
     border: "none",
-    borderRadius: "4px",
+    borderRadius: "8px",
     fontSize: "1rem",
     cursor: "pointer",
+    transition: "background-color 0.2s, transform 0.2s",
+    boxShadow: "0px 5px 10px rgba(76, 110, 245, 0.3)",
+    fontWeight: "bold",
     marginTop: "1rem",
   },
   error: {
     marginTop: "1rem",
-    color: "red",
+    color: "#ffb3b3",
     textAlign: "center",
+    fontSize: "0.9rem",
   },
 };
 

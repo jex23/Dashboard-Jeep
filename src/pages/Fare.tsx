@@ -1,23 +1,19 @@
-// pages/Home.tsx
+// pages/Fare.tsx
 import React from "react";
 import Sidebar from "../components/Sidebar";
 
-const Home: React.FC = () => {
+const Fare: React.FC = () => {
   return (
     <div style={styles.container}>
-      {/* Sidebar */}
       <Sidebar />
-
-      {/* Main Content */}
       <main style={styles.content}>
-        <h1 style={styles.heading}>Welcome to the Home Page</h1>
-        <p style={styles.paragraph}>You are successfully logged in!</p>
+        <h1 style={styles.heading}>Fare Page</h1>
+        <p style={styles.paragraph}>View and update fare details and pricing information here.</p>
       </main>
     </div>
   );
 };
 
-// Styles for Home page layout
 const styles: { [key: string]: React.CSSProperties } = {
   container: {
     display: "flex",
@@ -26,7 +22,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     backgroundColor: "#f4f4f4",
   },
   content: {
-    flex: 1, // Takes up the remaining width after the sidebar
+    flex: 1,
     padding: "2rem",
     display: "flex",
     flexDirection: "column",
@@ -46,4 +42,4 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
 };
 
-export default Home;
+export default Fare;
