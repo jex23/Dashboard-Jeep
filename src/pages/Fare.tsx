@@ -17,12 +17,14 @@ import {
 
 const FarePage: React.FC = () => {
   const [route, setRoute] = useState<string>("Bulan");
-  const [selectedTab] = useState<string>("Bulan");
+  const [selectedTab, setSelectedTab] = useState<string>("Bulan");
   const [km, setKm] = useState<number>(0);
   const [location, setLocation] = useState<string>("");
   const [farePerKm, setFarePerKm] = useState<number>(0);
   const [first4KmPrice, setFirst4KmPrice] = useState<number>(0);
-  const [fareData, setFareData] = useState<{ id: string; Km: number; Location: string }[]>([]);
+  const [fareData, setFareData] = useState<
+    { id: string; Km: number; Location: string }[]
+  >([]);
   const [showAddDistance, setShowAddDistance] = useState<boolean>(false);
   const [showFareDetails, setShowFareDetails] = useState<boolean>(false);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
@@ -34,7 +36,11 @@ const FarePage: React.FC = () => {
     try {
       const routeDocRef = doc(collection(db, "fare_matrix"), route);
       const distancesCollection = collection(routeDocRef, "distances");
-      const kmQuery = query(distancesCollection, orderBy("Km", "desc"), limit(1));
+      const kmQuery = query(
+        distancesCollection,
+        orderBy("Km", "desc"),
+        limit(1)
+      );
       const querySnapshot = await getDocs(kmQuery);
 
       setKm(querySnapshot.empty ? 0 : querySnapshot.docs[0].data().Km + 1);
@@ -65,15 +71,28 @@ const FarePage: React.FC = () => {
 
     let q;
     if (direction === "next" && lastVisible) {
-      q = query(distancesCollection, orderBy("Km", "asc"), startAfter(lastVisible), limit(rowsPerPage));
+      q = query(
+        distancesCollection,
+        orderBy("Km", "asc"),
+        startAfter(lastVisible),
+        limit(rowsPerPage)
+      );
     } else if (direction === "previous" && firstVisible) {
-      q = query(distancesCollection, orderBy("Km", "asc"), endBefore(firstVisible), limit(rowsPerPage));
+      q = query(
+        distancesCollection,
+        orderBy("Km", "asc"),
+        endBefore(firstVisible),
+        limit(rowsPerPage)
+      );
     } else {
       q = query(distancesCollection, orderBy("Km", "asc"), limit(rowsPerPage));
     }
 
     const querySnapshot = await getDocs(q);
-    const data = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as { id: string; Km: number; Location: string }[];
+    const data = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as { id: string; Km: number; Location: string }[];
     setFareData(data);
     setFirstVisible(querySnapshot.docs[0]);
     setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
@@ -83,20 +102,23 @@ const FarePage: React.FC = () => {
   };
 
   useEffect(() => {
+    fetchFarePerKm();
+    checkInitialKm(route);
+  }, [selectedTab, rowsPerPage]);
+
+  useEffect(() => {
     const routeDocRef = doc(db, "fare_matrix", selectedTab);
     const distancesCollection = collection(routeDocRef, "distances");
 
     const unsubscribe = onSnapshot(distancesCollection, (querySnapshot) => {
-      const data = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as { id: string; Km: number; Location: string }[];
+      const data = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as { id: string; Km: number; Location: string }[];
       setFareData(data);
     });
 
     return () => unsubscribe();
-  }, [selectedTab, rowsPerPage]);
-
-  useEffect(() => {
-    fetchFarePerKm();
-    checkInitialKm(route);
   }, [selectedTab, rowsPerPage]);
 
   const handleRouteChange = (newRoute: string) => {
@@ -150,8 +172,18 @@ const FarePage: React.FC = () => {
         <h1 style={styles.heading}>Fare Matrix</h1>
 
         <div style={styles.toggleContainer}>
-          <button style={styles.toggleButton} onClick={() => setShowAddDistance(true)}>Show Add Distance</button>
-          <button style={styles.toggleButton} onClick={() => setShowFareDetails(true)}>Show Fare Details</button>
+          <button
+            style={styles.toggleButton}
+            onClick={() => setShowAddDistance(true)}
+          >
+            Show Add Distance
+          </button>
+          <button
+            style={styles.toggleButton}
+            onClick={() => setShowFareDetails(true)}
+          >
+            Show Fare Details
+          </button>
         </div>
 
         {showAddDistance && (
@@ -159,16 +191,33 @@ const FarePage: React.FC = () => {
             <div style={styles.modalContent}>
               <h3>Add Distance</h3>
               <label>Select Route:</label>
-              <select value={route} onChange={(e) => handleRouteChange(e.target.value)} style={styles.select}>
+              <select
+                value={route}
+                onChange={(e) => handleRouteChange(e.target.value)}
+                style={styles.select}
+              >
                 <option value="Bulan">Bulan</option>
                 <option value="Matnog">Matnog</option>
               </select>
               <div>
                 <label>Km: {km}</label>
               </div>
-              <input type="text" placeholder="Enter location" value={location} onChange={(e) => setLocation(e.target.value)} style={styles.input} />
-              <button onClick={addToFareMatrix} style={styles.addButton}>Add Location</button>
-              <button onClick={() => setShowAddDistance(false)} style={styles.cancelButton}>Cancel</button>
+              <input
+                type="text"
+                placeholder="Enter location"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                style={styles.input}
+              />
+              <button onClick={addToFareMatrix} style={styles.addButton}>
+                Add Location
+              </button>
+              <button
+                onClick={() => setShowAddDistance(false)}
+                style={styles.cancelButton}
+              >
+                Cancel
+              </button>
             </div>
           </div>
         )}
@@ -178,16 +227,52 @@ const FarePage: React.FC = () => {
             <div style={styles.modalContent}>
               <h3>Fare Details</h3>
               <label>Fare per Km:</label>
-              <input type="number" value={farePerKm} onChange={(e) => setFarePerKm(Number(e.target.value))} style={styles.input} />
+              <input
+                type="number"
+                value={farePerKm}
+                onChange={(e) => setFarePerKm(Number(e.target.value))}
+                style={styles.input}
+              />
               <label>First 4 Km Price:</label>
-              <input type="number" value={first4KmPrice} onChange={(e) => setFirst4KmPrice(Number(e.target.value))} style={styles.input} />
-              <button onClick={() => {}} style={styles.updateButton}>Update Fare</button>
-              <button onClick={() => setShowFareDetails(false)} style={styles.cancelButton}>Cancel</button>
+              <input
+                type="number"
+                value={first4KmPrice}
+                onChange={(e) => setFirst4KmPrice(Number(e.target.value))}
+                style={styles.input}
+              />
+              <button onClick={() => {}} style={styles.updateButton}>
+                Update Fare
+              </button>
+              <button
+                onClick={() => setShowFareDetails(false)}
+                style={styles.cancelButton}
+              >
+                Cancel
+              </button>
             </div>
           </div>
         )}
 
         <h4 style={styles.listHeading}>Fare Data for {selectedTab}</h4>
+        <div style={styles.tabContainer}>
+          <button
+            style={
+              selectedTab === "Bulan" ? styles.activeTab : styles.inactiveTab
+            }
+            onClick={() => setSelectedTab("Bulan")}
+          >
+            Bulan
+          </button>
+          <button
+            style={
+              selectedTab === "Matnog" ? styles.activeTab : styles.inactiveTab
+            }
+            onClick={() => setSelectedTab("Matnog")}
+          >
+            Matnog
+          </button>
+        </div>
+
         <div style={styles.tableContainer}>
           <table style={styles.table}>
             <thead>
@@ -203,7 +288,12 @@ const FarePage: React.FC = () => {
                   <td>{data.Location}</td>
                   <td>{data.Km}</td>
                   <td>
-                    <button onClick={() => deleteFare(data.id)} style={styles.deleteButton}>Delete</button>
+                    <button
+                      onClick={() => deleteFare(data.id)}
+                      style={styles.deleteButton}
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -212,14 +302,29 @@ const FarePage: React.FC = () => {
         </div>
 
         <div style={styles.paginationContainer}>
-          <button onClick={() => fetchFareData("previous")} style={styles.paginationButton} disabled={currentPage === 1}>Previous</button>
+          <button
+            onClick={() => fetchFareData("previous")}
+            style={styles.paginationButton}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
           <span style={styles.pageIndicator}>Page {currentPage}</span>
-          <button onClick={() => fetchFareData("next")} style={styles.paginationButton}>Next</button>
+          <button
+            onClick={() => fetchFareData("next")}
+            style={styles.paginationButton}
+          >
+            Next
+          </button>
         </div>
 
         <div style={styles.rowsPerPageContainer}>
           <label>Rows per page:</label>
-          <select value={rowsPerPage} onChange={handleRowsPerPageChange} style={styles.rowLimitSelect}>
+          <select
+            value={rowsPerPage}
+            onChange={handleRowsPerPageChange}
+            style={styles.rowLimitSelect}
+          >
             <option value={10}>10</option>
             <option value={20}>20</option>
             <option value={50}>50</option>
@@ -250,6 +355,27 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontSize: "2rem",
     color: "#fff",
     marginBottom: "1rem",
+  },
+  tabContainer: {
+    display: "flex",
+    marginBottom: "1rem",
+  },
+  activeTab: {
+    padding: "0.8rem 1.5rem",
+    backgroundColor: "#4c6ef5",
+    color: "#fff",
+    border: "none",
+    borderRadius: "8px 8px 0 0",
+    cursor: "pointer",
+    fontWeight: "bold",
+  },
+  inactiveTab: {
+    padding: "0.8rem 1.5rem",
+    backgroundColor: "#aaa",
+    color: "#fff",
+    border: "none",
+    borderRadius: "8px 8px 0 0",
+    cursor: "pointer",
   },
   toggleContainer: {
     display: "flex",
@@ -331,13 +457,6 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   tableRow: {
     transition: "background-color 0.2s",
-  },
-  tableData: {
-    padding: "1rem",
-    backgroundColor: "#fff",
-    color: "#333",
-    borderBottom: "1px solid #ddd",
-    fontSize: "0.9rem",
   },
   deleteButton: {
     padding: "0.4rem 1rem",
