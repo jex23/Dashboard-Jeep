@@ -10,14 +10,14 @@ import { collection, onSnapshot } from "firebase/firestore";
 
 // Define the custom icons
 const passengerIcon = L.icon({
-  iconUrl: 'src/assets/arm-up.png',
+  iconUrl: 'https://i.ibb.co/Bqh7Dc4/arm-up.png',
   iconSize: [32, 32],
   iconAnchor: [16, 32],
   popupAnchor: [0, -32],
 });
 
 const busIcon = L.icon({
-  iconUrl: 'src/assets/bus2.png',
+  iconUrl: 'https://i.ibb.co/Qnt3rbx/bus2.png',
   iconSize: [40, 40],
   iconAnchor: [20, 40],
   popupAnchor: [0, -40],
