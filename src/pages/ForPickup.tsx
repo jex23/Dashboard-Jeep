@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import { db } from "../firebaseConfig";
-import { collection, getDocs, doc, getDoc } from "firebase/firestore";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { collection, getDocs, doc, getDoc, deleteDoc } from "firebase/firestore";
 
 interface PickupData {
   busNumber: number;
@@ -27,6 +29,7 @@ const ForPickup: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [rowsPerPage, setRowsPerPage] = useState<number>(5); // Default rows per page
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [deleteUid, setDeleteUid] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPickupData = async () => {
@@ -64,6 +67,33 @@ const ForPickup: React.FC = () => {
 
     fetchPickupData();
   }, [rowsPerPage]);
+
+  const deletePickup = async (uid: string) => {
+    try {
+      await deleteDoc(doc(db, "For_Pick_Up", uid));
+      setPickupData((prevData) => prevData.filter((data) => data.uid !== uid));
+      toast.success("Record successfully deleted!", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "colored",
+      });
+    } catch (error) {
+      console.error("Error deleting document:", error);
+      toast.error("Failed to delete record.", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "colored",
+      });
+    }
+  };
 
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
@@ -105,6 +135,7 @@ const ForPickup: React.FC = () => {
                 <th style={styles.tableHeader}>Distance (Km)</th>
                 <th style={styles.tableHeader}>Fare ($)</th>
                 <th style={styles.tableHeader}>Status</th>
+                <th style={styles.tableHeader}>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -119,6 +150,14 @@ const ForPickup: React.FC = () => {
                   <td style={styles.tableData}>{data.distance}</td>
                   <td style={styles.tableData}>{data.fare.toFixed(2)}</td>
                   <td style={styles.tableData}>{data.status}</td>
+                  <td style={styles.tableData}>
+                    <button
+                      style={styles.deleteButton}
+                      onClick={() => setDeleteUid(data.uid)}
+                    >
+                      Delete
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -148,11 +187,43 @@ const ForPickup: React.FC = () => {
           </select>
         </div>
       </main>
+
+      {/* Confirmation Dialog */}
+      {deleteUid && (
+        <div style={styles.confirmationDialog}>
+          <p>Are you sure you want to delete this record?</p>
+          <button
+            style={styles.confirmButton}
+            onClick={() => {
+              deletePickup(deleteUid);
+              setDeleteUid(null);
+            }}
+          >
+            Confirm
+          </button>
+          <button
+            style={styles.cancelButton}
+            onClick={() => setDeleteUid(null)}
+          >
+            Cancel
+          </button>
+        </div>
+      )}
+
+      <ToastContainer />
     </div>
   );
 };
 
 const styles: { [key: string]: React.CSSProperties } = {
+  deleteButton: {
+    padding: "0.5rem 1rem",
+    backgroundColor: "#e63946",
+    color: "#fff",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
+  },
   container: {
     display: "flex",
     width: "100vw",
@@ -231,6 +302,38 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderRadius: "4px",
     border: "1px solid #ddd",
   },
+  confirmationDialog: {
+    position: "fixed",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    background: "linear-gradient(135deg, #4c6ef5, #b23fef)", // Gradient background
+    color: "#fff", // White text
+    padding: "1.5rem",
+    borderRadius: "8px",
+    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+    zIndex: 1000,
+    textAlign: "center",
+  },
+  confirmButton: {
+    padding: "0.5rem 1rem",
+    backgroundColor: "#4caf50",
+    color: "#fff",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
+    margin: "0 0.5rem",
+  },
+  cancelButton: {
+    padding: "0.5rem 1rem",
+    backgroundColor: "#e63946",
+    color: "#fff",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
+    margin: "0 0.5rem",
+  },
+  
 };
 
 export default ForPickup;
