@@ -46,7 +46,7 @@ const ForPickup: React.FC = () => {
           const passengerData = passengerDoc.exists() ? passengerDoc.data() as PassengerData : { fullName: "N/A", passengerType: "N/A", email: "N/A" };
 
           return {
-            docId: pickupDoc.id, // Include the document ID here
+            docId: pickupDoc.id, // Include the document ID here (still necessary for deletion)
             busNumber: data.busNumber,
             check: data.check,
             destination: data.destination,
@@ -73,14 +73,9 @@ const ForPickup: React.FC = () => {
 
   const deletePickup = async (docId: string) => {
     try {
-      // Log the docId to verify it's correct
       console.log("Attempting to delete document with Doc ID:", docId);
-      
-      // Delete the document from 'For_Pick_Up' collection
       await deleteDoc(doc(db, "For_Pick_Up", docId));
       console.log("Deleted from 'For_Pick_Up':", docId);
-
-      // Optionally, update state to remove the deleted data
       setPickupData((prevData) => prevData.filter((data) => data.docId !== docId));
       toast.success("Record successfully deleted!", {
         position: "top-right",
@@ -126,7 +121,7 @@ const ForPickup: React.FC = () => {
           <table style={styles.table}>
             <thead>
               <tr>
-                <th style={styles.tableHeader}>Doc ID</th>
+                {/* Removed Doc ID header */}
                 <th style={styles.tableHeader}>Passenger Name</th>
                 <th style={styles.tableHeader}>Passenger Type</th>
                 <th style={styles.tableHeader}>Email</th>
@@ -142,7 +137,7 @@ const ForPickup: React.FC = () => {
             <tbody>
               {currentRows.map((data) => (
                 <tr key={data.docId} style={styles.tableRow}>
-                  <td style={styles.tableData}>{data.docId}</td>
+                  {/* Removed Doc ID column */}
                   <td style={styles.tableData}>{data.passengerName}</td>
                   <td style={styles.tableData}>{data.passengerType}</td>
                   <td style={styles.tableData}>{data.passengerEmail}</td>
@@ -259,80 +254,72 @@ const styles: { [key: string]: React.CSSProperties } = {
     backgroundColor: "#333",
     color: "#fff",
     textAlign: "left",
-    fontSize: "1rem",
   },
   tableRow: {
-    transition: "background-color 0.2s",
+    borderBottom: "1px solid #ddd",
   },
   tableData: {
-    padding: "1rem",
-    color: "#333",
-    borderBottom: "1px solid #ddd",
-    fontSize: "0.9rem",
+    padding: "0.8rem",
+    textAlign: "left",
   },
   paginationContainer: {
     display: "flex",
-    justifyContent: "center",
     alignItems: "center",
     marginTop: "1rem",
   },
   paginationButton: {
     padding: "0.5rem 1rem",
-    backgroundColor: "#4c6ef5",
+    backgroundColor: "#007bff",
     color: "#fff",
     border: "none",
     borderRadius: "5px",
     cursor: "pointer",
-    margin: "0 0.5rem",
+    margin: "0 1rem",
   },
   pageIndicator: {
-    margin: "0 1rem",
-    color: "#fff",
     fontSize: "1rem",
   },
   rowsPerPageContainer: {
-    display: "flex",
-    alignItems: "center",
     marginTop: "1rem",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
   },
   rowLimitSelect: {
-    marginLeft: "0.5rem",
     padding: "0.5rem",
-    borderRadius: "4px",
-    border: "1px solid #ddd",
+    borderRadius: "5px",
+    border: "1px solid #ccc",
+    marginTop: "0.5rem",
   },
   confirmationDialog: {
     position: "fixed",
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    background: "linear-gradient(135deg, #4c6ef5, #b23fef)", // Gradient background
-    color: "#fff", // White text
-    padding: "1.5rem",
+    backgroundColor: "#fff",
+    padding: "2rem",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
     borderRadius: "8px",
-    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
     zIndex: 1000,
-    textAlign: "center",
   },
   confirmButton: {
-    padding: "0.5rem 1rem",
-    backgroundColor: "#4caf50",
+    backgroundColor: "#007bff",
     color: "#fff",
     border: "none",
+    padding: "0.5rem 1rem",
+    margin: "0 1rem",
     borderRadius: "5px",
     cursor: "pointer",
-    margin: "0 0.5rem",
   },
   cancelButton: {
-    padding: "0.5rem 1rem",
     backgroundColor: "#e63946",
     color: "#fff",
     border: "none",
+    padding: "0.5rem 1rem",
+    margin: "0 1rem",
     borderRadius: "5px",
     cursor: "pointer",
-    margin: "0 0.5rem",
   },
-  
 };
 
 export default ForPickup;
