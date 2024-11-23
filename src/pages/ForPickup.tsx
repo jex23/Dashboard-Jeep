@@ -16,6 +16,7 @@ interface PickupData {
   passengerName: string;
   passengerType: string;
   passengerEmail: string;
+  docId: string;
 }
 
 interface PassengerData {
@@ -29,7 +30,7 @@ const ForPickup: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [rowsPerPage, setRowsPerPage] = useState<number>(5); // Default rows per page
   const [totalPages, setTotalPages] = useState<number>(1);
-  const [deleteUid, setDeleteUid] = useState<string | null>(null);
+  const [deleteDocId, setDeleteDocId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPickupData = async () => {
@@ -39,11 +40,13 @@ const ForPickup: React.FC = () => {
           const data = pickupDoc.data();
           const { uid } = data;
 
+          // Fetching passenger data
           const passengerDocRef = doc(db, "Passengers", uid);
           const passengerDoc = await getDoc(passengerDocRef);
-          const passengerData = (passengerDoc.exists() ? passengerDoc.data() : {}) as PassengerData;
+          const passengerData = passengerDoc.exists() ? passengerDoc.data() as PassengerData : { fullName: "N/A", passengerType: "N/A", email: "N/A" };
 
           return {
+            docId: pickupDoc.id, // Include the document ID here
             busNumber: data.busNumber,
             check: data.check,
             destination: data.destination,
@@ -51,9 +54,9 @@ const ForPickup: React.FC = () => {
             fare: data.fare,
             status: data.status,
             uid: data.uid,
-            passengerName: passengerData.fullName || "N/A",
-            passengerType: passengerData.passengerType || "N/A",
-            passengerEmail: passengerData.email || "N/A",
+            passengerName: passengerData.fullName,
+            passengerType: passengerData.passengerType,
+            passengerEmail: passengerData.email,
           };
         });
 
@@ -68,29 +71,26 @@ const ForPickup: React.FC = () => {
     fetchPickupData();
   }, [rowsPerPage]);
 
-  const deletePickup = async (uid: string) => {
+  const deletePickup = async (docId: string) => {
     try {
-      await deleteDoc(doc(db, "For_Pick_Up", uid));
-      setPickupData((prevData) => prevData.filter((data) => data.uid !== uid));
+      // Log the docId to verify it's correct
+      console.log("Attempting to delete document with Doc ID:", docId);
+      
+      // Delete the document from 'For_Pick_Up' collection
+      await deleteDoc(doc(db, "For_Pick_Up", docId));
+      console.log("Deleted from 'For_Pick_Up':", docId);
+
+      // Optionally, update state to remove the deleted data
+      setPickupData((prevData) => prevData.filter((data) => data.docId !== docId));
       toast.success("Record successfully deleted!", {
         position: "top-right",
         autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "colored",
       });
     } catch (error) {
       console.error("Error deleting document:", error);
-      toast.error("Failed to delete record.", {
+      toast.error("Failed to delete the record.", {
         position: "top-right",
         autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "colored",
       });
     }
   };
@@ -126,6 +126,7 @@ const ForPickup: React.FC = () => {
           <table style={styles.table}>
             <thead>
               <tr>
+                <th style={styles.tableHeader}>Doc ID</th>
                 <th style={styles.tableHeader}>Passenger Name</th>
                 <th style={styles.tableHeader}>Passenger Type</th>
                 <th style={styles.tableHeader}>Email</th>
@@ -139,8 +140,9 @@ const ForPickup: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {currentRows.map((data, index) => (
-                <tr key={index} style={styles.tableRow}>
+              {currentRows.map((data) => (
+                <tr key={data.docId} style={styles.tableRow}>
+                  <td style={styles.tableData}>{data.docId}</td>
                   <td style={styles.tableData}>{data.passengerName}</td>
                   <td style={styles.tableData}>{data.passengerType}</td>
                   <td style={styles.tableData}>{data.passengerEmail}</td>
@@ -153,7 +155,7 @@ const ForPickup: React.FC = () => {
                   <td style={styles.tableData}>
                     <button
                       style={styles.deleteButton}
-                      onClick={() => setDeleteUid(data.uid)}
+                      onClick={() => setDeleteDocId(data.docId)}
                     >
                       Delete
                     </button>
@@ -164,7 +166,6 @@ const ForPickup: React.FC = () => {
           </table>
         </div>
 
-        {/* Pagination Controls */}
         <div style={styles.paginationContainer}>
           <button onClick={handlePreviousPage} style={styles.paginationButton} disabled={currentPage === 1}>
             Previous
@@ -177,7 +178,6 @@ const ForPickup: React.FC = () => {
           </button>
         </div>
 
-        {/* Rows Per Page Selector */}
         <div style={styles.rowsPerPageContainer}>
           <label>Rows per page:</label>
           <select value={rowsPerPage} onChange={handleRowsPerPageChange} style={styles.rowLimitSelect}>
@@ -188,22 +188,21 @@ const ForPickup: React.FC = () => {
         </div>
       </main>
 
-      {/* Confirmation Dialog */}
-      {deleteUid && (
+      {deleteDocId && (
         <div style={styles.confirmationDialog}>
           <p>Are you sure you want to delete this record?</p>
           <button
             style={styles.confirmButton}
             onClick={() => {
-              deletePickup(deleteUid);
-              setDeleteUid(null);
+              deletePickup(deleteDocId);
+              setDeleteDocId(null); // Clear the docId after deletion
             }}
           >
             Confirm
           </button>
           <button
             style={styles.cancelButton}
-            onClick={() => setDeleteUid(null)}
+            onClick={() => setDeleteDocId(null)}
           >
             Cancel
           </button>
